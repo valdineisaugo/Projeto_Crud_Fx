@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -29,32 +30,25 @@ public class LoginController  {
 
     public void login(ActionEvent event){
         try {
-            List<Users> usersList = UsersDAO.listAll();
-            System.out.println("Total de usuários na lista: " + usersList.size());
             //Validar login e carregar tela
             String login = textLogin.getText().toString();
             String password = textPassword.getText().toString();
-            boolean status = false;
-            //percorrer a lista e achar o login
-            for(Users u : usersList){
-                if(login.equals(u.getLogin()) && password.equals(u.getPassword())){
-                    status = true;
-                    usuarioLogado = u;
-                    Stage stage = new Stage();
-                    Parent root = FXMLLoader.load(getClass().getResource("/fxml/Cadastro.fxml"));
-                    stage.setScene(new Scene(root));
-                    stage.setTitle("My modal window");
-                    stage.initModality(Modality.WINDOW_MODAL);
-                    stage.initOwner(((Node)event.getSource()).getScene().getWindow() );
-                    stage.show();
-                    break;
-                }else{
-                    status = false;
-                }
+            UsersDAO usersDAO = new UsersDAO();
+            if(usersDAO.login(login, password)){
+                Stage stage = new Stage();
+                Parent root = FXMLLoader.load(getClass().getResource("/fxml/Cadastro.fxml"));
+                stage.setScene(new Scene(root));
+                stage.setTitle("My modal window");
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(((Node)event.getSource()).getScene().getWindow() );
+                stage.show();
+
+            }else{
+                Alert msg = new Alert(Alert.AlertType.ERROR);
+                msg.setContentText("Login incorreto!\nTente novamente");
+                msg.show();
             }
-            if(!status){
-                System.out.println("Login incorreto!");
-            }
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (IOException e) {

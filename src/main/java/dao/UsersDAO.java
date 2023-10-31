@@ -8,28 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsersDAO {
+    static Connection connection;
+    public UsersDAO(){
+        try {
+            connection = DbConnection.getConnectionSqlite();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    public static void create(Users user) throws SQLException {
-        Connection connection;
+    public void create(Users user) throws SQLException {
         PreparedStatement stmt;
-        connection = DbConnection.getConnectionSqlite();
         String save = "insert into users (name, age, login, password) values (?, ?, ?, ?)";
         stmt = connection.prepareStatement(save);
-        //Receber dados do par�metro
+        //Receber dados do parâmetro
         stmt.setString(1, user.getName());
         stmt.setInt(2, user.getAge());
         stmt.setString(3, user.getLogin());
         stmt.setString(4, user.getPassword());
-        //Executar a instru��o
+        //Executar a instrução
         stmt.execute();
         connection.close();
     }
 
-    public static Users select(int id) throws SQLException {
-        Connection connection;
+    public Users select(int id) throws SQLException {
         PreparedStatement stmt;
         ResultSet rst;
-        connection = DbConnection.getConnectionSqlite();
         String search = "select *from users where id = ?";
         stmt = connection.prepareStatement(search);
         stmt.setInt(1, id);
@@ -48,24 +52,20 @@ public class UsersDAO {
         return user;
     }
 
-    public static void update(Users user) throws SQLException {
-        Connection connection;
-        connection = DbConnection.getConnectionSqlite();
+    public  void update(Users user) throws SQLException {
         PreparedStatement stmt;
-        if(connection != null){
-            String update = "update users set name = ?, age = ?, login = ?, password = ? where id = ?";
-            stmt = connection.prepareStatement(update);
-            stmt.setString(1, user.getName());
-            stmt.setInt(2, user.getAge());
-            stmt.setString(3, user.getLogin());
-            stmt.setString(4, user.getPassword());
-            stmt.setInt(5, user.getId());
-            stmt.close();
-        }
+        String update = "update users set name = ?, age = ?, login = ?, password = ? where id = ?";
+        stmt = connection.prepareStatement(update);
+        stmt.setString(1, user.getName());
+        stmt.setInt(2, user.getAge());
+        stmt.setString(3, user.getLogin());
+        stmt.setString(4, user.getPassword());
+        stmt.setInt(5, user.getId());
+        stmt.close();
+
     }
 
-    public static List<Users> listAll() throws SQLException {
-        Connection connection;
+    public  List<Users> listAll() throws SQLException {
         connection = DbConnection.getConnectionSqlite();
         Statement stmt;
         ResultSet rst;
@@ -85,5 +85,17 @@ public class UsersDAO {
         rst.close();
         connection.close();
         return listUsers;
+    }
+    public boolean login(String login, String senha) throws SQLException {
+        boolean status = false;
+        String loginSQL = "select *from users where login = ? and password = ?";
+        PreparedStatement stmt = connection.prepareStatement(loginSQL);
+        stmt.setString(1, login);
+        stmt.setString(2, senha);
+        ResultSet rst = stmt.executeQuery();
+        if(rst.next()){
+            status = true;
+        }
+        return status;
     }
 }

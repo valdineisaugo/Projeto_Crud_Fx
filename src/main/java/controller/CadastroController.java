@@ -41,7 +41,8 @@ public class CadastroController implements Initializable {
     public void retrieve(ActionEvent event) throws SQLException {
         if(!textID.getText().isEmpty()){
             int id = Integer.parseInt(textID.getText().toString());
-            Users user = UsersDAO.select(id);
+            UsersDAO usersDAO = new UsersDAO();
+            Users user = usersDAO.select(id);
             textName.setText(user.getName());
         }else{
             System.out.println("Error");
@@ -61,11 +62,6 @@ public class CadastroController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Usu�rio logado: ");
-        System.out.println(LoginController.usuarioLogado.getName());
-        System.out.println(LoginController.usuarioLogado.getId());
-        System.out.println(LoginController.usuarioLogado.getAge());
-
         columnAge.setCellValueFactory(new PropertyValueFactory<>("age"));
         try {
             usersTable.setItems(usersList());
@@ -74,6 +70,6 @@ public class CadastroController implements Initializable {
         }
     }
     private ObservableList<Users> usersList() throws SQLException {
-        return FXCollections.observableArrayList(UsersDAO.listAll());
+        return FXCollections.observableArrayList(new UsersDAO().listAll());
     }
 }

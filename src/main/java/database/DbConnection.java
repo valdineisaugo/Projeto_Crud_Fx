@@ -6,8 +6,7 @@ import java.sql.SQLException;
 
 public class DbConnection {
     public static Connection getConnectionSqlite() throws SQLException {
-        Connection connection;
-        connection = DriverManager.getConnection("jdbc:sqlite:database.db");
-        return connection;
+        return DriverManager.getConnection("jdbc:sqlite:database.db");
+
     }
 }
